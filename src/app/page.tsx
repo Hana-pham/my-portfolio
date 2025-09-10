@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import ContactForm from '@/components/ContactForm'
 
 // Project data with more detail for learning
 const projectsData = [
@@ -327,6 +328,7 @@ export default function Home() {
               Building real-world applications to demonstrate modern frontend development skills
             </p>
           </div>
+
           
           {/* Project Filters */}
           <div className="flex flex-wrap justify-center gap-4 mb-12">
@@ -372,6 +374,22 @@ export default function Home() {
           )}
         </div>
       </section>
+      {/* Contact Section */}
+<section id="contact" className={`py-20 transition-colors ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+  <div className="max-w-4xl mx-auto px-6">
+    <div className="text-center mb-12">
+      <h2 className={`text-4xl font-bold mb-4 transition-colors ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+        Let's Connect
+      </h2>
+      <p className={`text-lg max-w-2xl mx-auto transition-colors ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+        Ready to work together? Send me a message and I'll get back to you within 24 hours.
+      </p>
+    </div>
+    
+    <ContactForm />
+  </div>
+</section>
+
     </div>
   )
 }
