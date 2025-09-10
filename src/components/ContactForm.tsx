@@ -30,7 +30,7 @@ export default function ContactForm(){
   const [submitMessage, setSubmitMessage] = useState('')
 
   //handle input changes 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const {name, value} = e.target
 
     //Update the form data
