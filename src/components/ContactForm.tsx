@@ -1,125 +1,128 @@
-'user client'
-import { resolve } from "path"
-import React, { useState } from "react"
-import { Tracing } from "trace_events"
-import { serialize } from "v8"
-//define form data 
-interface FormData{
-    name: string
-    email: string 
-    message: string
-    inquiryType: 'job' | 'freelance' | 'collaboration'
-}
-//define form data error 
-interface FormErrors{
-    name?: string
-    email?: string
-    message?: string
+'use client'
+import { useState } from 'react'
+
+// Step 1: Define what our form data looks like
+interface FormData {
+  name: string
+  email: string  
+  message: string
+  inquiryType: 'job' | 'freelance' | 'collaboration'
 }
 
-export default function ContactForm(){
-    //set up state 
-   const [formData, setFormData] = useState<FormData>({
+interface FormErrors {
+  name?: string
+  email?: string
+  message?: string
+}
+
+export default function ContactForm() {
+  // Step 2: Set up all our state
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
     message: '',
-    inquiryType: 'kjob'
+    inquiryType: 'job'
   })
+  
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState('')
 
-  //handle input changes 
+  // Step 3: Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const {name, value} = e.target
-
-    //Update the form data
-    setFormData(previous => ({
-      ...previous,
+    const { name, value } = e.target
+    
+    // Update the form data
+    setFormData(prev => ({
+      ...prev,
       [name]: value
     }))
-
-    //clear any error for this field
-    if(errors[name as keyof FormErrors]){
-        setErrors(previous => ({
-            ...previous,
-            [name]: undefined
-        }))
+    
+    // Clear any error for this field
+    if (errors[name as keyof FormErrors]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: undefined
+      }))
     }
   }
-  //validate the form 
+
+  // Step 4: Validate the form
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
-
-    //name field validation
-    if (!formData.name.trim()){
-        newErrors.name = 'Name is required'
-    } else if (formData.name.trim.length < 2){
-        newErrors.name = 'Name must be at least 2 characters'
+    
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required'
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = 'Name must be at least 2 characters'
     }
-
-    //Email validation 
-    if (formData.email.trim()){
-        newErrors.email = 'Email is required'
+    
+    // Email validation
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required'
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email'
     }
-
-    //Message validation
-    if (!formData.message.trim()){
-        newErrors.message = 'Message is required'
-    } else if (formData.message.trim().length <10){
-        newErrors.message = 'Message must be at least 10 characters long'
+    
+    // Message validation
+    if (!formData.message.trim()) {
+      newErrors.message = 'Message is required'
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = 'Message must be at least 10 characters'
     }
-
+    
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  // Handle data after the form got submitted 
-  const HandleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault() // prevent refresh 
-
-    //Validate data first 
-    if (!validateForm()){
-        return
+  // Step 5: Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    // Validate first
+    if (!validateForm()) {
+      return
     }
-
+    
     setIsSubmitting(true)
     setSubmitMessage('')
-
+    
     try {
-        await new Promise(resolve => setTimeout(resolve, 2000))
-
-        //simulate random sucess / failing for testing 
-        if (Math.random() > 0.2){
-            setSubmitMessage('Messsage sent to Hana, I will get back to you soon.')
-            //reset form on sucess 
-            setFormData({
-                name: '',
-                email: '',
-                message: '',
-                inquiryType: 'job'
-            })
-        } else {
-            setSubmitMessage('Failed to submit your request, please try again.')
-        }
-    } catch (error){
-        setSubmitMessage('Something went wrong, please try again.')
+      // Simulate API call (we'll make this real later)
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Simulate random success/failure for learning
+      if (Math.random() > 0.2) {
+        setSubmitMessage('✅ Message sent successfully! I\'ll get back to you soon.')
+        // Reset form on success
+        setFormData({
+          name: '',
+          email: '',
+          message: '',
+          inquiryType: 'job'
+        })
+      } else {
+        setSubmitMessage('❌ Failed to send message. Please try again.')
+      }
+    } catch (error) {
+      setSubmitMessage('❌ Something went wrong. Please try again.')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   return (
-    <div className='max-w-md mx-auto bg-white p-6 rounded-lg shadow-md'>
-    <h2 className="text-2xl font-bold md-6 text-grey-800">Contact Me</h2>
-
-    <form onSubmit={HandleSubmit} className="space-y-4">
-    {/*Name input*/}
-    <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-        Name *
-        </label>
-        <input
+    <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">Contact Me</h2>
+      
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Name Input */}
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            Name *
+          </label>
+          <input
             type="text"
             id="name"
             name="name"
