@@ -26,34 +26,34 @@ const MOCK_PROJECTS: Project[] = [
     description: 'Dynamic portfolio generator using OpenAI GPT-4 API with real-time preview and component library.',
     status: 'in-progress',
     tech: ['Next.js 14', 'TypeScript', 'Tailwind CSS', 'OpenAI API', 'Framer Motion'],
-    github: 'https://github.com/yourusername/ai-portfolio',
-    demo: 'https://your-portfolio.vercel.app',
+    github: 'https://github.com/Hana-pham/HanaPortfolio',
+    demo: 'https://hanapham.com',
     progress: 85,
-    createdAt: '2024-01-15',
+    createdAt: '2025-08-15',
     image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400'
   },
   {
     id: '2', 
-    title: 'Real-time Chat Application',
+    title: 'Real-time Chat with Flowerist',
     description: 'WebSocket-based chat app with rooms, file sharing, and message encryption.',
     status: 'completed',
     tech: ['React', 'Node.js', 'Socket.io', 'MongoDB', 'JWT Auth'],
-    github: 'https://github.com/yourusername/chat-app',
-    demo: 'https://chat-app-demo.vercel.app',
+    github: 'https://github.com/Hana-pham/SpringPetals',
+    demo: 'https://spring-petals.com',
     progress: 100,
-    createdAt: '2024-01-01',
+    createdAt: '2025-09-01',
     image: 'https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=400'
   },
   {
     id: '3',
-    title: 'E-commerce Dashboard',
-    description: 'Analytics dashboard for online stores with real-time sales tracking and inventory management.',
+    title: 'Microservice app for women',
+    description: 'Women health tracking based on women cycle',
     status: 'planning',
     tech: ['Next.js', 'Prisma', 'PostgreSQL', 'Chart.js', 'Stripe API'],
-    github: 'https://github.com/yourusername/ecommerce-dashboard',
+    github: 'https://github.com/Hana-pham/Luna',
     demo: '#',
     progress: 15,
-    createdAt: '2024-02-01',
+    createdAt: '2025-09-01',
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400'
   }
 ]
@@ -62,7 +62,7 @@ const MOCK_STATS = {
   totalProjects: 3,
   completedProjects: 1,
   githubStars: 47,
-  yearsExperience: 2
+  yearsExperience: 0
 }
 
 // Simulate network delay and potential failures
