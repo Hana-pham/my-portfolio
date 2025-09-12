@@ -36,11 +36,11 @@ const MOCK_PROJECTS: Project[] = [
     id: '2', 
     title: 'Real-time Chat with Flowerist',
     description: 'WebSocket-based chat app with rooms, file sharing, and message encryption.',
-    status: 'completed',
+    status: 'in-progress',
     tech: ['React', 'Node.js', 'Socket.io', 'MongoDB', 'JWT Auth'],
     github: 'https://github.com/Hana-pham/SpringPetals',
     demo: 'https://spring-petals.com',
-    progress: 100,
+    progress: 50,
     createdAt: '2025-09-01',
     image: 'https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=400'
   },
