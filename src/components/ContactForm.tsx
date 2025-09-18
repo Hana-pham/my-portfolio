@@ -1,125 +1,93 @@
 'use client'
 import { useState } from 'react'
 
-// Step 1: Define what our form data looks like
+interface ContactFormProps {
+  isDarkMode: boolean
+}
+
 interface FormData {
   name: string
-  email: string  
+  email: string
+  inquiryType: string
   message: string
-  inquiryType: 'job' | 'freelance' | 'collaboration'
 }
 
-interface FormErrors {
-  name?: string
-  email?: string
-  message?: string
-}
-
-export default function ContactForm() {
-  // Step 2: Set up all our state
+export default function ContactForm({ isDarkMode }: ContactFormProps) {
   const [formData, setFormData] = useState<FormData>({
-    name: '',
-    email: '',
-    message: '',
-    inquiryType: 'job'
+    name: "",
+    email: "",
+    inquiryType: "job",
+    message: ""
   })
   
-  const [errors, setErrors] = useState<FormErrors>({})
+  const [errors, setErrors] = useState<Partial<FormData>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitMessage, setSubmitMessage] = useState('')
+  const [submitMessage, setSubmitMessage] = useState("")
 
-  // Step 3: Handle input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
+    setFormData({ ...formData, [name]: value })
     
-    // Update the form data
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-    
-    // Clear any error for this field
-    if (errors[name as keyof FormErrors]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: undefined
-      }))
+    // Clear error when user starts typing
+    if (errors[name as keyof FormData]) {
+      setErrors({ ...errors, [name]: "" })
     }
   }
 
-  // Step 4: Validate the form
   const validateForm = (): boolean => {
-    const newErrors: FormErrors = {}
-    
-    // Name validation
+    const newErrors: Partial<FormData> = {}
+
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required'
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters'
+      newErrors.name = "Name is required"
     }
-    
-    // Email validation
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email'
+      newErrors.email = "Email is required"
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Please enter a valid email"
     }
-    
-    // Message validation
+
     if (!formData.message.trim()) {
-      newErrors.message = 'Message is required'
-    } else if (formData.message.trim().length < 10) {
-      newErrors.message = 'Message must be at least 10 characters'
+      newErrors.message = "Message is required"
+    } else if (formData.message.length < 10) {
+      newErrors.message = "Message must be at least 10 characters"
     }
-    
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  // Step 5: Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    // Validate first
-    if (!validateForm()) {
-      return
-    }
-    
+    if (!validateForm()) return
+
     setIsSubmitting(true)
-    setSubmitMessage('')
-    
+    setSubmitMessage("")
+
     try {
-      // Simulate API call (we'll make this real later)
+      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000))
       
-      // Simulate random success/failure for learning
-      if (Math.random() > 0.2) {
-        setSubmitMessage('✅ Message sent successfully! I\'ll get back to you soon.')
-        // Reset form on success
-        setFormData({
-          name: '',
-          email: '',
-          message: '',
-          inquiryType: 'job'
-        })
-      } else {
-        setSubmitMessage('❌ Failed to send message. Please try again.')
-      }
+      setSubmitMessage("Thank you! Your message has been sent successfully.")
+      
+      // Clear form after successful submission
+      setFormData({ name: "", email: "", inquiryType: "job", message: "" })
+      
     } catch (error) {
-      setSubmitMessage('❌ Something went wrong. Please try again.')
+      setSubmitMessage("Something went wrong. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Contact Me</h2>
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Name Input */}
+    <div className={`rounded-2xl p-8 shadow-xl transition-colors ${isDarkMode ? 'bg-gray-700' : 'bg-white'}`}>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Name Field */}
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="name" className={`block text-sm font-medium mb-1 transition-colors ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
             Name *
           </label>
           <input
@@ -128,17 +96,21 @@ export default function ContactForm() {
             name="name"
             value={formData.name}
             onChange={handleInputChange}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.name ? 'border-red-500' : 'border-gray-300'
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+              errors.name 
+                ? 'border-red-500' 
+                : isDarkMode 
+                  ? 'border-gray-600 bg-gray-800 text-white' 
+                  : 'border-gray-300 bg-white text-gray-900'
             }`}
             placeholder="Your full name"
           />
           {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
         </div>
 
-        {/* Email Input */}
+        {/* Email Field */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="email" className={`block text-sm font-medium mb-1 transition-colors ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
             Email *
           </label>
           <input
@@ -147,8 +119,12 @@ export default function ContactForm() {
             name="email"
             value={formData.email}
             onChange={handleInputChange}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.email ? 'border-red-500' : 'border-gray-300'
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+              errors.email 
+                ? 'border-red-500' 
+                : isDarkMode 
+                  ? 'border-gray-600 bg-gray-800 text-white' 
+                  : 'border-gray-300 bg-white text-gray-900'
             }`}
             placeholder="your.email@example.com"
           />
@@ -157,7 +133,7 @@ export default function ContactForm() {
 
         {/* Inquiry Type */}
         <div>
-          <label htmlFor="inquiryType" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="inquiryType" className={`block text-sm font-medium mb-1 transition-colors ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
             Inquiry Type
           </label>
           <select
@@ -165,7 +141,11 @@ export default function ContactForm() {
             name="inquiryType"
             value={formData.inquiryType}
             onChange={handleInputChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+              isDarkMode 
+                ? 'border-gray-600 bg-gray-800 text-white' 
+                : 'border-gray-300 bg-white text-gray-900'
+            }`}
           >
             <option value="job">Job Opportunity</option>
             <option value="freelance">Freelance Project</option>
@@ -175,7 +155,7 @@ export default function ContactForm() {
 
         {/* Message */}
         <div>
-          <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="message" className={`block text-sm font-medium mb-1 transition-colors ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
             Message *
           </label>
           <textarea
@@ -184,13 +164,17 @@ export default function ContactForm() {
             value={formData.message}
             onChange={handleInputChange}
             rows={4}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.message ? 'border-red-500' : 'border-gray-300'
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+              errors.message 
+                ? 'border-red-500' 
+                : isDarkMode 
+                  ? 'border-gray-600 bg-gray-800 text-white' 
+                  : 'border-gray-300 bg-white text-gray-900'
             }`}
             placeholder="Tell me about your project or opportunity..."
           />
           {errors.message && <p className="mt-1 text-sm text-red-600">{errors.message}</p>}
-          <p className="mt-1 text-sm text-gray-500">
+          <p className={`mt-1 text-sm transition-colors ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
             {formData.message.length}/500 characters
           </p>
         </div>
@@ -211,7 +195,7 @@ export default function ContactForm() {
 
       {/* Success/Error Message */}
       {submitMessage && (
-        <div className="mt-4 p-3 rounded-md bg-gray-100">
+        <div className={`mt-4 p-3 rounded-md transition-colors ${isDarkMode ? 'bg-gray-600' : 'bg-gray-100'}`}>
           <p className="text-sm">{submitMessage}</p>
         </div>
       )}

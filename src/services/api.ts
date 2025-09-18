@@ -1,4 +1,6 @@
-// Simulate a real API with delays and potential failures
+// src/services/api.ts
+import { config, isDevelopment } from '@/config'
+
 export interface Project {
   id: string
   title: string
@@ -18,7 +20,7 @@ export interface ApiResponse<T> {
   message?: string
 }
 
-// Mock data that simulates a real backend
+// ✅ MOCK DATA: Configurable based on environment
 const MOCK_PROJECTS: Project[] = [
   {
     id: '1',
@@ -26,52 +28,46 @@ const MOCK_PROJECTS: Project[] = [
     description: 'Dynamic portfolio generator using OpenAI GPT-4 API with real-time preview and component library.',
     status: 'in-progress',
     tech: ['Next.js 14', 'TypeScript', 'Tailwind CSS', 'OpenAI API', 'Framer Motion'],
-    github: 'https://github.com/Hana-pham/HanaPortfolio',
-    demo: 'https://hanapham.com',
+    github: config.contact.github,
+    demo: '#',
     progress: 85,
-    createdAt: '2025-08-15',
+    createdAt: '2024-01-15',
     image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400'
   },
   {
     id: '2', 
-    title: 'Real-time Chat with Flowerist',
-    description: 'WebSocket-based chat app with rooms, file sharing, and message encryption.',
-    status: 'in-progress',
-    tech: ['React', 'Node.js', 'Socket.io', 'MongoDB', 'JWT Auth'],
-    github: 'https://github.com/Hana-pham/SpringPetals',
-    demo: 'https://spring-petals.com',
-    progress: 50,
-    createdAt: '2025-09-01',
+    title: 'Contact Form with Auto-Save',
+    description: 'Professional contact form with real-time validation, auto-save drafts, and error boundaries.',
+    status: 'completed',
+    tech: ['React', 'TypeScript', 'useLocalStorage', 'useCallback', 'Error Boundaries'],
+    github: config.contact.github,
+    demo: '#',
+    progress: 100,
+    createdAt: '2024-01-01',
     image: 'https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=400'
   },
   {
     id: '3',
-    title: 'Microservice app for women',
-    description: 'Women health tracking based on women cycle',
+    title: 'Performance Optimized Dashboard',
+    description: 'Analytics dashboard with React.memo, useMemo, and useCallback optimizations for large datasets.',
     status: 'planning',
-    tech: ['Next.js', 'Prisma', 'PostgreSQL', 'Chart.js', 'Stripe API'],
-    github: 'https://github.com/Hana-pham/Luna',
+    tech: ['Next.js', 'React.memo', 'useMemo', 'useCallback', 'Chart.js'],
+    github: config.contact.github,
     demo: '#',
     progress: 15,
-    createdAt: '2025-09-01',
+    createdAt: '2024-02-01',
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400'
   }
 ]
 
-const MOCK_STATS = {
-  totalProjects: 3,
-  completedProjects: 1,
-  githubStars: 47,
-  yearsExperience: 0
-}
-
-// Simulate network delay and potential failures
-const simulateNetworkCall = async <T>(data: T, delay: number = 1000, failRate: number = 0.1): Promise<ApiResponse<T>> => {
-  await new Promise(resolve => setTimeout(resolve, delay))
+// ✅ CONFIGURABLE API SIMULATION
+const simulateNetworkCall = async <T>(data: T): Promise<ApiResponse<T>> => {
+  // Use configured delay
+  await new Promise(resolve => setTimeout(resolve, config.dev.mockApiDelay))
   
-  // Simulate random failures
-  if (Math.random() < failRate) {
-    throw new Error('Network request failed')
+  // Simulate occasional failures (only in development)
+  if (isDevelopment && Math.random() < 0.1) {
+    throw new Error('Simulated network error for testing')
   }
   
   return {
@@ -81,64 +77,50 @@ const simulateNetworkCall = async <T>(data: T, delay: number = 1000, failRate: n
   }
 }
 
-// API functions
+// ✅ API FUNCTIONS: Environment-aware
 export const projectsApi = {
-  // Fetch all projects
   getAll: async (): Promise<ApiResponse<Project[]>> => {
     try {
-      return await simulateNetworkCall(MOCK_PROJECTS, 1500, 0.05)
+      if (config.dev.enableMockData) {
+        // Use mock data in development
+        return await simulateNetworkCall(MOCK_PROJECTS)
+      } else {
+        // Make real API call
+        const response = await fetch(`${config.api.baseUrl}/projects`)
+        const data = await response.json()
+        return data
+      }
     } catch (error) {
       return {
         data: [],
         success: false,
-        message: 'Failed to fetch projects'
-      }
-    }
-  },
-
-  // Fetch single project
-  getById: async (id: string): Promise<ApiResponse<Project | null>> => {
-    try {
-      const project = MOCK_PROJECTS.find(p => p.id === id)
-      return await simulateNetworkCall(project || null, 800, 0.1)
-    } catch (error) {
-      return {
-        data: null,
-        success: false,
-        message: 'Failed to fetch project'
-      }
-    }
-  },
-
-  // Get portfolio stats
-  getStats: async (): Promise<ApiResponse<typeof MOCK_STATS>> => {
-    try {
-      return await simulateNetworkCall(MOCK_STATS, 600, 0.05)
-    } catch (error) {
-      return {
-        data: { totalProjects: 0, completedProjects: 0, githubStars: 0, yearsExperience: 0 },
-        success: false,
-        message: 'Failed to fetch stats'
+        message: 'Failed to fetch projects. Please try again.'
       }
     }
   }
 }
 
-// Contact form submission
+// ✅ CONTACT API: Environment-aware
 export const contactApi = {
   submit: async (formData: any): Promise<ApiResponse<{ message: string }>> => {
     try {
-      // Simulate form submission
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // Random success/failure for testing
-      if (Math.random() < 0.8) {
+      if (config.dev.enableMockData) {
+        // Simulate form submission
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        
         return {
-          data: { message: 'Thank you! I\'ll get back to you within 24 hours.' },
+          data: { message: `Thank you! I'll get back to you at ${config.contact.email}.` },
           success: true
         }
       } else {
-        throw new Error('Server error')
+        // Make real API call
+        const response = await fetch(`${config.api.baseUrl}/contact`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        })
+        const data = await response.json()
+        return data
       }
     } catch (error) {
       return {
@@ -147,4 +129,13 @@ export const contactApi = {
       }
     }
   }
+}
+
+// ✅ DEBUG INFO
+if (isDevelopment && config.dev.showDebugInfo) {
+  console.log('🌐 API Configuration:', {
+    baseUrl: config.api.baseUrl,
+    mockData: config.dev.enableMockData,
+    mockDelay: config.dev.mockApiDelay
+  })
 }
